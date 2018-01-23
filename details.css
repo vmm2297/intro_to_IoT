@@ -12,3 +12,31 @@
 .chart {
 	margin: 30px auto;
 }
+
+#tables-container {
+	display: flex;
+	justify-content: center;
+}
+
+.table {
+	display: inline-block;
+	margin: 30px;
+	font-size: 15px;
+	overflow-y: auto;
+	height: 350px;
+}
+
+table, th, td {
+	padding: 12px;
+    border: 1px solid grey;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+tr:nth-child(even) {background-color: #D4D4D4;}
+tr:hover {background-color: #949494;}
+
+th {
+    background-color: #465a3f;
+    color: white;
+}
