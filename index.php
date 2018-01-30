@@ -2,28 +2,28 @@
 <html>
 <head>
   <title>AmbiLamp</title>
-  <link rel="stylesheet" type="text/css" href="index.css">
-  <link rel="stylesheet" type="text/css" href="header.css">
+  <link rel="stylesheet" type="text/css" href="assets/css/index.css">
   <script src="jscolor.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.bundle.min.js"></script>
 </head>
 <body>
 
-<!-- HEADER -->
-<header>
-	<ul>
-		<li><image src="https://www.viesso.com/media/catalog/product/cache/1/thumbnail/9df78eab33525d08d6e5fb8d27136e95/l/i/lightbox-base-3.jpg"></li>
-		<li><a href="index.html">AmbiLamp</a></li>
-		<li><a href="details.html">Details</a></li>
-	</ul>
-</header>
+<?php
+  include "GPIO.php";
+  include "header.php";
+
+  $color = "EFFFC9";
+  if (isset($_POST['set_color'])) {
+    $color = $_POST['color'];
+  }
+?>
 
 <!-- JSCOLOR PICKER -->
-<input type="button" class="JSCOLOR" id="picker" value="EFFFC9">
+<input type="button" class="JSCOLOR" id="picker" onchange="update(this.jscolor)" onfocusout="apply()" value=<?php echo "'" . $color . "'"; ?>>
 
 <!-- FORM -->
-<form>
-	<input type="text" id="color">
+<form method="POST">
+	<input type="text" id="color" name="color">
+  <input type="submit" id="smt" name="set_color" hidden>
 	<input type="submit" value="Set as Default" id="set_default">
 </form>
 
@@ -48,6 +48,6 @@
 	<p>Pellentesque at metus erat. Maecenas ut orci mauris. Vivamus non ullamcorper mi, sed lacinia justo. Nam lorem neque, efficitur vitae congue quis, vehicula id orci. In hac habitasse platea dictumst. Nam sed consectetur arcu, id consequat tortor. Nulla lorem nulla, ultricies a lorem a, condimentum ornare odio. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; In gravida felis vel auctor lobortis. Sed efficitur sapien in ullamcorper bibendum. Etiam luctus bibendum imperdiet. Phasellus ac facilisis libero. Curabitur dictum bibendum molestie. Interdum et malesuada fames ac ante ipsum primis in faucibus. Praesent vel mi sodales, fermentum nunc at, tristique risus. Fusce et aliquet metus, vitae eleifend nunc.</p>
 </div>
 
-<script type="text/javascript" src="index.js"></script>
+<script type="text/javascript" src="assets/js/index.js"></script>
 </body>
 </html>
