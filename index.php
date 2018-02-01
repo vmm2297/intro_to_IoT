@@ -11,6 +11,19 @@
   include "GPIO.php";
   include "header.php";
 
+  if (isset($_POST['set_default'])) {
+    $color_data->insert($_POST['color']);
+  }
+
+  $red = new GPIO(22,"out",4);
+  $green = new GPIO(27,"out",3);
+  $blue = new GPIO(17,"out",1);
+  $colorArray = $color.str_split();
+
+  $red->pwm_write(hexdec($colorArray[0].$colorArray[1]));
+  $green->pwm_write(hexdec($colorArray[2].$colorArray[3]));
+  $blue->pwm_write(hexdec($colorArray[4].$colorArray[5]));
+
   $color = "EFFFC9";
   if (isset($_POST['set_color'])) {
     $color = $_POST['color'];
