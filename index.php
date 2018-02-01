@@ -3,7 +3,7 @@
 <head>
   <title>AmbiLamp</title>
   <link rel="stylesheet" type="text/css" href="assets/css/index.css">
-  <script src="jscolor.js"></script>
+  <script src="assets/js/jscolor.js"></script>
 </head>
 <body>
 
