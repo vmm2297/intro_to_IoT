@@ -1,3 +1,11 @@
+<?php
+	function connectMongo() {
+		$connection = new MongoClient("mongodb://admin:admin@ds046867.mlab.com:46867/intro_to_iot");
+		$db = $connection->intro_to_iot;
+		return $db;
+	}
+?>
+
 <link rel="stylesheet" type="text/css" href="assets/css/header.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.bundle.min.js"></script>
 

@@ -11,6 +11,22 @@
   include "GPIO.php";
   include "header.php";
 
+  /* BEGIN COLOR */
+  $default_color = "EFFFC9";
+  $db = connectMongo();
+  $color_data = $db->color;
+
+  if (isset($_POST['set_default'])) {
+    $num_entries = $color_data->count();
+    $color_dict = array('color' => $_POST['color'], 'entry' => $num_entries + 1$);
+    $color_data->insert($color_dict);
+  }
+
+  $cursorColor = $color_data->find()->sort(array('entry' => -1))->limit(1);
+  foreach($cursorColor as $doc) {
+    $default_color = $doc['color'];
+  }
+
   if (isset($_POST['set_default'])) {
     $color_data->insert($_POST['color']);
   }
@@ -28,6 +44,93 @@
   $red->pwm_write(hexdec($colorArray[0].$colorArray[1]));
   $green->pwm_write(hexdec($colorArray[2].$colorArray[3]));
   $blue->pwm_write(hexdec($colorArray[4].$colorArray[5]));
+
+  /* Connect to the DB */
+  $db = connectMongo();
+  $sounds = $db->sound;
+  $temperatures = $db->temp;
+  $soundCursor = $sounds->find()->sort(array('entry' => -1))->limit(168);
+  $temperatureCursor = $temperatures->find()->sort(array('entry' => -1))->limit(168);
+
+  /* BEGIN SOUND DATA PARSING */
+  $hourSums = array_fill(0,24,0);
+  $hourCounts = array_fill(0,24,0);
+
+  foreach ($soundCursor as $doc){
+    $time = split('[-:]', $doc['time'])[3];
+    $hourCounts[$time] = $hourCounts[$time] + 1;
+    $hourSums[$time] = $hourSums[$time] + $doc['audio'];
+  }
+
+  $soundMin = 1000;
+  $soundMax = 0;
+  $soundDataDay = '[';
+  $soundDataNight = '[';
+  for ($i = 0; $i < 24; $i = $i + 1) {
+    $hourSums[$i] = $hourSums[$i]/$hourCounts[$i];
+
+    if ((float)$hourSums[$i] > $soundMax) {
+      $soundMax = (float)$hourSums[$i];
+    }
+
+    if ((float)$hourSums[$i] < $soundMin) {
+      $soundMin = (float)$hourSums[$i];
+    }
+
+    if ($i <12) {
+      $soundDataDay = $soundDataDay . (float)$hourSums[$i] . ",";
+    } else {
+      $soundDataNight = $soundDataNight . (float)$hourSums[$i] . ",";
+    }
+  }
+  /* END SOUND DATA PARSING */
+  /* Assign arrays to JS variables */
+  echo "<script>";
+  echo "var soundDataDay = " . $soundDataDay . ";";
+  echo "var soundDataNight = " . $soundDataNight . ";";
+  echo "var soundMin = " . $soundMin . ";";
+  echo "var soundMax = " . $soundMax . ";";
+  echo "</script>";
+
+  /* BEGIN TEMPERATURE DATA PARSING */
+  $hourSums = array_fill(0,24,0);
+  $hourCounts = array_fill(0,24,0);
+
+  foreach ($temperatureCursor as $doc){
+    $time = split('[-:]', $doc['time'])[3];
+    $hourCounts[$time] = $hourCounts[$time] + 1;
+    $hourSums[$time] = $hourSums[$time] + $doc['audio'];
+  }
+
+  $temperatureMin = 1000;
+  $temperatureMax = 0;
+  $temperatureDataDay = '[';
+  $temperatureDataNight = '[';
+  for ($i = 0; $i < 24; $i = $i + 1) {
+    $hourSums[$i] = $hourSums[$i]/$hourCounts[$i];
+
+    if ((float)$hourSums[$i] > $temperatureMax) {
+      $temperatureMax = (float)$hourSums[$i];
+    }
+
+    if ((float)$hourSums[$i] < $temperatureMin) {
+      $temperatureMin = (float)$hourSums[$i];
+    }
+
+    if ($i <12) {
+      $temperatureDataDay = $temperatureDataDay . (float)$hourSums[$i] . ",";
+    } else {
+      $temperatureDataNight = $temperatureDataNight . (float)$hourSums[$i] . ",";
+    }
+  }
+  /* END TEMPERATURE DATA PARSING */
+  /* Assign arrays to JS variables */
+  echo "<script>";
+  echo "var temperatureDataDay = " . $temperatureDataDay . ";";
+  echo "var temperatureDataNight = " . $temperatureDataNight . ";";
+  echo "var temperatureMin = " . $temperatureMin . ";";
+  echo "var temperatureMax = " . $temperatureMax . ";";
+  echo "</script>";
 ?>
 
 <!-- JSCOLOR PICKER -->
@@ -37,7 +140,7 @@
 <form method="POST">
 	<input type="text" id="color" name="color">
   <input type="submit" id="smt" name="set_color" hidden>
-	<input type="submit" value="Set as Default" id="set_default">
+	<input type="submit" value="Set as Default" id="set_default" name="set_default">
 </form>
 
 <!-- CHARTS -->
